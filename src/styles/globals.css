@@ -1,0 +1,323 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* ─── Background Layers ─── */
+  --bg-base: #0B0E14;
+  --bg-surface: #12161F;
+  --bg-card: #181D28;
+  --bg-elevated: #1E2433;
+
+  /* ─── Primary ─── */
+  --primary: #FF6D3F;
+  --primary-hover: #FF8A5C;
+  --primary-glow: rgba(255, 109, 63, 0.15);
+  --primary-gradient: linear-gradient(135deg, #FF6D3F, #FF9040);
+
+  /* ─── Accents ─── */
+  --accent-teal: #2DD4A8;
+  --accent-blue: #4D8EFF;
+  --danger: #FF4D6A;
+  --warning: #FFB547;
+
+  /* ─── Text ─── */
+  --text-primary: #F1F3F8;
+  --text-secondary: #A8B2C8;
+  --text-muted: #6B7A99;
+
+  /* ─── Borders ─── */
+  --border: rgba(255, 255, 255, 0.06);
+  --border-active: rgba(255, 255, 255, 0.12);
+
+  /* ─── Spacing ─── */
+  --container-max: 1200px;
+  --section-padding: 80px;
+
+  /* ─── Radius ─── */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+}
+
+/* ─── Base Reset ─── */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-outfit), system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+/* ─── Typography ─── */
+h1, h2, h3, h4 {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--text-primary);
+}
+
+h1 { font-size: clamp(32px, 5vw, 52px); }
+h2 { font-size: clamp(24px, 3.5vw, 36px); }
+h3 { font-size: clamp(20px, 2.5vw, 28px); }
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--primary-hover);
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-base);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-muted);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* ─── Animations ─── */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes ringDraw {
+  from {
+    stroke-dashoffset: 314;
+  }
+  to {
+    stroke-dashoffset: var(--ring-offset, 0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px var(--primary-glow);
+  }
+  50% {
+    box-shadow: 0 0 40px var(--primary-glow), 0 0 60px rgba(255, 109, 63, 0.08);
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.6s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.5s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+.animate-ring-draw {
+  animation: ringDraw 1.5s ease-out forwards;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* ─── Stagger delays ─── */
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+.delay-4 { animation-delay: 0.4s; }
+.delay-5 { animation-delay: 0.5s; }
+
+/* ─── Glass Card ─── */
+.glass-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(12px);
+}
+
+.glass-card-elevated {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(12px);
+}
+
+/* ─── Gradient Text ─── */
+.gradient-text {
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Progress Bar ─── */
+.progress-bar {
+  height: 4px;
+  background: var(--bg-elevated);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--primary-gradient);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+/* ─── Chat Bubble ─── */
+.chat-bubble {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px 16px 16px 4px;
+  padding: 16px 20px;
+  max-width: 85%;
+}
+
+.chat-bubble-user {
+  background: rgba(255, 109, 63, 0.1);
+  border: 1px solid rgba(255, 109, 63, 0.2);
+  border-radius: 16px 16px 4px 16px;
+  padding: 12px 18px;
+  margin-left: auto;
+}
+
+/* ─── Score Ring ─── */
+.score-ring {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.score-ring svg {
+  transform: rotate(-90deg);
+}
+
+.score-ring-track {
+  fill: none;
+  stroke: var(--bg-elevated);
+  stroke-width: 8;
+}
+
+.score-ring-fill {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-dasharray: 314;
+  transition: stroke-dashoffset 1.5s ease-out;
+}
+
+.score-ring-text {
+  position: absolute;
+  font-size: 36px;
+  font-weight: 800;
+  font-family: var(--font-fraunces), Georgia, serif;
+}
+
+/* ─── Selection States ─── */
+::selection {
+  background: rgba(255, 109, 63, 0.3);
+  color: var(--text-primary);
+}
+
+/* ─── Focus States ─── */
+*:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ─── Input Styles ─── */
+input, textarea {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  padding: 12px 16px;
+  font-family: var(--font-outfit), system-ui, sans-serif;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+  width: 100%;
+}
+
+input:focus, textarea:focus {
+  border-color: var(--primary);
+  outline: none;
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--text-muted);
+}

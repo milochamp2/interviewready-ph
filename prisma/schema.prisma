@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id               String       @id @default(uuid()) @db.Uuid
+  language         String       @default("en") // "en" | "tl"
+  identityType     String       @map("identity_type")
+  importanceLevel  String       @map("importance_level")
+  worry            String
+  failedBefore     String       @map("failed_before")
+  role             String
+  experienceLevel  String       @map("experience_level")
+  interviewTiming  String       @map("interview_timing")
+  jobDescription   String?      @map("job_description")
+  readinessScore   Int?         @map("readiness_score")
+  createdAt        DateTime     @default(now()) @map("created_at")
+
+  interview        Interview?
+  entitlement      Entitlement?
+  bundleOutput     BundleOutput?
+  emailRequests    EmailRequest[]
+
+  @@map("sessions")
+}
+
+model Interview {
+  id          String   @id @default(uuid()) @db.Uuid
+  sessionId   String   @unique @map("session_id") @db.Uuid
+  teaserJson  Json     @map("teaser_json")  // 3 questions + feedback
+  fullJson    Json     @map("full_json")    // 15 questions + rubrics + sample answers
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  session     Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("interviews")
+}
+
+model Entitlement {
+  id               String   @id @default(uuid()) @db.Uuid
+  sessionId        String   @unique @map("session_id") @db.Uuid
+  plan             String   // "basic_399" | "bundle_999"
+  status           String   @default("locked") // "locked" | "active"
+  activatedAt      DateTime? @map("activated_at")
+  expiresAt        DateTime? @map("expires_at")
+  extensionsUsed   Int      @default(0) @map("extensions_used")
+  paymentReference String?  @unique @map("payment_reference")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  session          Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("entitlements")
+}
+
+model BundleOutput {
+  id              String   @id @default(uuid()) @db.Uuid
+  sessionId       String   @unique @map("session_id") @db.Uuid
+  resumeInput     String?  @map("resume_input")
+  resumeOutputJson Json?   @map("resume_output_json")
+  coverLetterText String?  @map("cover_letter_text")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  session         Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("bundle_outputs")
+}
+
+model EmailRequest {
+  id        String    @id @default(uuid()) @db.Uuid
+  sessionId String    @map("session_id") @db.Uuid
+  email     String
+  pdfSentAt DateTime? @map("pdf_sent_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  session   Session   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("email_requests")
+}
