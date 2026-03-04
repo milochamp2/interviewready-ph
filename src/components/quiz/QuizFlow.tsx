@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { trackEvent } from "@/components/ui/MetaPixel";
+import { useLanguage } from "@/components/ui/Providers";
 
 interface QuizStep {
   id: string;
@@ -109,10 +110,12 @@ const STEPS: QuizStep[] = [
 
 export function QuizFlow() {
   const router = useRouter();
+  const { language, t } = useLanguage();
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
-  const [language] = useState<"en" | "tl">("en");
+  const [error, setError] = useState<string | null>(null);
+  const [animKey, setAnimKey] = useState(0);
 
   const step = STEPS[currentStep];
   const progress = ((currentStep + 1) / STEPS.length) * 100;
@@ -123,12 +126,16 @@ export function QuizFlow() {
     setAnswers(newAnswers);
 
     if (!isLastStep) {
-      setTimeout(() => setCurrentStep((s) => s + 1), 300);
+      setTimeout(() => {
+        setCurrentStep((s) => s + 1);
+        setAnimKey((k) => k + 1);
+      }, 300);
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     setLoading(true);
+    setError(null);
 
     try {
       const res = await fetch("/api/session/create", {
@@ -152,12 +159,28 @@ export function QuizFlow() {
       if (data.success) {
         trackEvent("Lead");
         router.push(`/r/${data.data.sessionId}`);
+      } else {
+        const errMsg =
+          typeof data.error === "string"
+            ? data.error
+            : "Something went wrong. Please try again.";
+        setError(errMsg);
       }
-    } catch (err) {
-      console.error("Session creation failed:", err);
+    } catch {
+      setError(
+        t(
+          "Something went wrong. Please try again.",
+          "May nangyaring mali. Subukan ulit."
+        )
+      );
     } finally {
       setLoading(false);
     }
+  }, [answers, language, router, t]);
+
+  const goBack = () => {
+    setCurrentStep((s) => s - 1);
+    setAnimKey((k) => k + 1);
   };
 
   const questionText = language === "tl" ? step.questionTl : step.question;
@@ -173,28 +196,29 @@ export function QuizFlow() {
       </div>
 
       <div className="flex-1 flex items-center justify-center px-6">
-        <div className="w-full max-w-[480px]">
-          {/* Chat bubble question */}
-          <div className="animate-slide-up mb-8">
+        <div className="w-full max-w-[480px]" key={animKey}>
+          {/* Chat bubble */}
+          <div className="animate-slide-in-left mb-8">
             <div className="chat-bubble">
-              <p className="text-[16px] leading-relaxed">{questionText}</p>
+              <p className="text-[16px] leading-relaxed font-medium">
+                {questionText}
+              </p>
             </div>
           </div>
 
-          {/* Options */}
+          {/* Select options */}
           {step.type === "select" && (
-            <div className="space-y-3 animate-slide-up delay-1">
-              {step.options.map((option) => (
+            <div className="space-y-3">
+              {step.options.map((option, i) => (
                 <button
                   key={option.value}
                   onClick={() => handleSelect(option.value)}
-                  className={`w-full text-left p-4 rounded-[12px] border transition-all duration-300 ${
-                    answers[step.id] === option.value
-                      ? "border-[--primary] bg-[rgba(255,109,63,0.1)] text-[--text-primary]"
-                      : "border-[--border] bg-[--bg-card] text-[--text-secondary] hover:border-[--border-active] hover:bg-[--bg-elevated]"
+                  className={`option-card w-full text-left animate-slide-up opacity-0 ${
+                    answers[step.id] === option.value ? "selected" : ""
                   }`}
+                  style={{ animationDelay: `${0.05 + i * 0.06}s` }}
                 >
-                  <span className="text-[14px] font-medium">
+                  <span className="relative z-10 text-[14px] font-medium text-[--text-secondary]">
                     {language === "tl" ? option.labelTl : option.label}
                   </span>
                 </button>
@@ -204,13 +228,12 @@ export function QuizFlow() {
 
           {/* Textarea (job description) */}
           {step.type === "textarea" && (
-            <div className="animate-slide-up delay-1">
+            <div className="animate-slide-up opacity-0 delay-1">
               <textarea
-                placeholder={
-                  language === "tl"
-                    ? "I-paste dito ang job description..."
-                    : "Paste the job description here..."
-                }
+                placeholder={t(
+                  "Paste the job description here...",
+                  "I-paste dito ang job description..."
+                )}
                 rows={5}
                 value={answers[step.id] || ""}
                 onChange={(e) =>
@@ -219,16 +242,27 @@ export function QuizFlow() {
                 maxLength={3000}
                 className="mb-4 resize-none"
               />
+
+              {error && (
+                <div className="text-[13px] text-[--danger] mb-3 glass-card-static p-3 animate-scale-in-bounce">
+                  {error}
+                </div>
+              )}
+
               <div className="flex gap-3">
-                <Button variant="ghost" onClick={handleSubmit} loading={loading}>
-                  Skip
+                <Button
+                  variant="ghost"
+                  onClick={handleSubmit}
+                  loading={loading}
+                >
+                  {t("Skip", "Laktawan")}
                 </Button>
                 <Button
                   onClick={handleSubmit}
                   loading={loading}
                   className="flex-1"
                 >
-                  {language === "tl" ? "Ipagpatuloy" : "Continue"}
+                  {t("Continue", "Ipagpatuloy")}
                 </Button>
               </div>
             </div>
@@ -237,10 +271,10 @@ export function QuizFlow() {
           {/* Back button */}
           {currentStep > 0 && step.type === "select" && (
             <button
-              onClick={() => setCurrentStep((s) => s - 1)}
-              className="mt-6 text-[13px] text-[--text-muted] hover:text-[--text-secondary] transition-colors mx-auto block"
+              onClick={goBack}
+              className="mt-6 text-[13px] text-[--text-muted] hover:text-[--text-secondary] transition-colors mx-auto block hover-scale"
             >
-              {language === "tl" ? "Bumalik" : "Go back"}
+              {t("Go back", "Bumalik")}
             </button>
           )}
         </div>

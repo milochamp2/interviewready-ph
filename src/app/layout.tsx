@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Outfit, Fraunces } from "next/font/google";
 import "@/styles/globals.css";
 import { MetaPixel } from "@/components/ui/MetaPixel";
+import { AppProviders } from "@/components/ui/Providers";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -33,9 +34,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${outfit.variable} ${fraunces.variable}`}>
+    <html lang="en" className={`${outfit.variable} ${fraunces.variable}`} suppressHydrationWarning>
       <body className="font-sans min-h-screen">
-        {children}
+        <AppProviders>
+          <div className="dot-grid" />
+          <div className="bg-blobs" />
+          {children}
+        </AppProviders>
         <MetaPixel />
       </body>
     </html>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { trackEvent } from "@/components/ui/MetaPixel";
+import { useLanguage } from "@/components/ui/Providers";
 import type { TeaserPayload } from "@/types";
 
 interface Props {
@@ -12,6 +13,7 @@ interface Props {
 
 export function MockInterview({ sessionId }: Props) {
   const router = useRouter();
+  const { t } = useLanguage();
   const [teaser, setTeaser] = useState<TeaserPayload | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentQ, setCurrentQ] = useState(0);
@@ -46,7 +48,14 @@ export function MockInterview({ sessionId }: Props) {
   if (loading) {
     return (
       <main className="pt-14 min-h-screen flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-[--bg-elevated] border-t-[--primary] rounded-full animate-spin" />
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-[--bg-elevated] border-t-[--primary] rounded-full animate-spin mx-auto" />
+          <div className="flex justify-center gap-2 mt-4">
+            <span className="typing-dot" />
+            <span className="typing-dot" />
+            <span className="typing-dot" />
+          </div>
+        </div>
       </main>
     );
   }
@@ -54,7 +63,9 @@ export function MockInterview({ sessionId }: Props) {
   if (!teaser) {
     return (
       <main className="pt-14 min-h-screen flex items-center justify-center">
-        <p className="text-[--text-secondary]">Failed to load interview.</p>
+        <p className="text-[--text-secondary]">
+          {t("Failed to load interview.", "Hindi na-load ang interview.")}
+        </p>
       </main>
     );
   }
@@ -65,15 +76,18 @@ export function MockInterview({ sessionId }: Props) {
     <main className="pt-14 min-h-screen">
       <div className="max-w-[540px] mx-auto px-6 py-12">
         {/* Header */}
-        <div className="text-center mb-8 animate-slide-up">
-          <span className="inline-block bg-[--bg-card] border border-[--border] rounded-full px-3 py-1 text-[12px] text-[--text-muted] mb-3">
-            Free Preview — {currentQ + 1} of {teaser.questions.length}
+        <div className="text-center mb-8 animate-slide-down">
+          <span className="inline-block glass-card-static px-4 py-1.5 text-[12px] text-[--text-muted] mb-3">
+            {t("Free Preview", "Libreng Preview")} — {currentQ + 1}{" "}
+            {t("of", "sa")} {teaser.questions.length}
           </span>
-          <h2 className="font-serif text-[28px]">Mock Interview</h2>
+          <h2 className="font-serif text-[28px]">
+            {t("Mock Interview", "Mock Interview")}
+          </h2>
         </div>
 
         {/* Question card */}
-        <div className="glass-card p-6 mb-4 animate-slide-up delay-1">
+        <div className="glass-card p-6 mb-4 animate-scale-in">
           <div className="flex items-center gap-2 mb-3">
             <span
               className={`text-[11px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full ${
@@ -99,14 +113,14 @@ export function MockInterview({ sessionId }: Props) {
             variant="secondary"
             size="sm"
             onClick={() => setShowAnswer(true)}
-            className="mb-6"
+            className="mb-6 hover-scale"
           >
-            Show Sample Answer
+            {t("Show Sample Answer", "Ipakita ang Sample Answer")}
           </Button>
         ) : (
-          <div className="glass-card-elevated p-5 mb-6 animate-fade-in">
+          <div className="glass-card-elevated p-5 mb-6 animate-slide-up">
             <div className="text-[12px] font-semibold text-[--accent-teal] uppercase tracking-wide mb-2">
-              Strong Sample Answer
+              {t("Strong Sample Answer", "Magandang Sample Answer")}
             </div>
             <p className="text-[14px] text-[--text-secondary] leading-relaxed">
               {question.sampleAnswer}
@@ -124,7 +138,7 @@ export function MockInterview({ sessionId }: Props) {
                 setShowAnswer(false);
               }}
             >
-              Previous
+              {t("Previous", "Nakaraan")}
             </Button>
           )}
           {currentQ < teaser.questions.length - 1 ? (
@@ -135,7 +149,7 @@ export function MockInterview({ sessionId }: Props) {
                 setShowAnswer(false);
               }}
             >
-              Next Question
+              {t("Next Question", "Susunod na Tanong")}
             </Button>
           ) : (
             <div className="flex-1" />
@@ -143,8 +157,8 @@ export function MockInterview({ sessionId }: Props) {
         </div>
 
         {/* Paywall */}
-        <div className="glass-card p-6 text-center animate-slide-up delay-2 border-[--primary] border-opacity-30">
-          <div className="w-12 h-12 bg-[--primary-glow] rounded-full flex items-center justify-center mx-auto mb-4">
+        <div className="glass-card p-6 text-center animate-slide-up animate-border-glow">
+          <div className="w-12 h-12 bg-[--primary-glow] rounded-full flex items-center justify-center mx-auto mb-4 animate-float">
             <svg
               width="24"
               height="24"
@@ -160,19 +174,26 @@ export function MockInterview({ sessionId }: Props) {
             </svg>
           </div>
           <h3 className="font-serif text-[20px] mb-2">
-            Unlock Full Interview
+            {t("Unlock Full Interview", "I-unlock ang Full Interview")}
           </h3>
           <p className="text-[14px] text-[--text-secondary] mb-1">
-            Get all 15 questions with AI scoring and detailed feedback
+            {t(
+              "Get all 15 questions with AI scoring and detailed feedback",
+              "Makuha ang lahat ng 15 questions na may AI scoring at detailed feedback"
+            )}
           </p>
           <p className="text-[13px] text-[--text-muted] mb-6">
             {teaser.feedbackSummary}
           </p>
-          <Button size="lg" onClick={handleCheckout} className="w-full mb-3">
-            Continue to Secure Checkout — ₱399
+          <Button
+            size="lg"
+            onClick={handleCheckout}
+            className="w-full mb-3 animate-pulse-glow"
+          >
+            {t("Continue to Secure Checkout — ₱399", "Magpatuloy sa Secure Checkout — ₱399")}
           </Button>
           <p className="text-[12px] text-[--text-muted]">
-            Upgrade available at checkout
+            {t("Upgrade available at checkout", "May upgrade sa checkout")}
           </p>
         </div>
       </div>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { trackEvent } from "@/components/ui/MetaPixel";
+import { useLanguage } from "@/components/ui/Providers";
 
 interface Props {
   sessionId: string;
@@ -18,9 +19,8 @@ const FEATURES = [
 ];
 
 export function CheckoutView({ sessionId }: Props) {
-  const [selectedPlan, setSelectedPlan] = useState<"basic_399" | "bundle_999">(
-    "basic_399"
-  );
+  const { t } = useLanguage();
+  const [selectedPlan, setSelectedPlan] = useState<"basic_399" | "bundle_999">("basic_399");
   const [loading, setLoading] = useState(false);
 
   const handlePlanChange = (plan: "basic_399" | "bundle_999") => {
@@ -58,17 +58,15 @@ export function CheckoutView({ sessionId }: Props) {
   return (
     <main className="pt-16 min-h-screen">
       <div className="max-w-[540px] mx-auto px-6 py-12">
-        <h2 className="font-serif text-[30px] text-center mb-8 tracking-tight">
-          Choose Your Plan
+        <h2 className="font-serif text-[30px] text-center mb-8 tracking-tight animate-slide-up">
+          {t("Choose Your Plan", "Pumili ng Plan")}
         </h2>
 
-        {/* Plan cards */}
+        {/* Basic plan */}
         <div
           onClick={() => handlePlanChange("basic_399")}
-          className={`bg-[--bg-card] border-2 rounded-[16px] p-6 cursor-pointer transition-all duration-300 mb-3 relative ${
-            selectedPlan === "basic_399"
-              ? "border-[--primary] shadow-[0_0_0_3px_var(--primary-glow)]"
-              : "border-[--border] hover:border-[--border-active]"
+          className={`plan-card mb-3 animate-slide-up opacity-0 delay-1 ${
+            selectedPlan === "basic_399" ? "selected" : ""
           }`}
         >
           <div
@@ -82,32 +80,35 @@ export function CheckoutView({ sessionId }: Props) {
               <div className="w-2 h-2 rounded-full bg-white" />
             )}
           </div>
-          <div className="font-bold text-[16px] mb-1">Full Interview Unlock</div>
+          <div className="font-bold text-[16px] mb-1">
+            {t("Full Interview Unlock", "Full Interview Unlock")}
+          </div>
           <div className="text-[32px] font-black">
             <span className="text-lg font-semibold text-[--text-secondary] align-top mr-0.5">
               ₱
             </span>
             399
             <span className="text-sm font-medium text-[--text-muted] ml-1">
-              one-time
+              {t("one-time", "isang beses")}
             </span>
           </div>
           <div className="text-sm text-[--text-muted] mt-2 leading-relaxed">
-            15 role-specific questions, AI scoring, sample answers, and
-            downloadable PDF. 30-day access.
+            {t(
+              "15 role-specific questions, AI scoring, sample answers, and downloadable PDF. 30-day access.",
+              "15 role-specific questions, AI scoring, sample answers, at downloadable PDF. 30-araw na access."
+            )}
           </div>
         </div>
 
+        {/* Bundle plan */}
         <div
           onClick={() => handlePlanChange("bundle_999")}
-          className={`bg-[--bg-card] border-2 rounded-[16px] p-6 cursor-pointer transition-all duration-300 mb-8 relative ${
-            selectedPlan === "bundle_999"
-              ? "border-[--primary] shadow-[0_0_0_3px_var(--primary-glow)]"
-              : "border-[--border] hover:border-[--border-active]"
+          className={`plan-card mb-8 animate-slide-up opacity-0 delay-2 ${
+            selectedPlan === "bundle_999" ? "selected" : ""
           }`}
         >
           <div className="absolute -top-3 left-6 bg-[--accent-teal] text-[--bg-base] text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wide">
-            Best Value
+            {t("Best Value", "Pinakamura")}
           </div>
           <div
             className={`absolute top-6 right-6 w-[22px] h-[22px] rounded-full border-2 flex items-center justify-center transition-all ${
@@ -121,7 +122,7 @@ export function CheckoutView({ sessionId }: Props) {
             )}
           </div>
           <div className="font-bold text-[16px] mb-1">
-            Complete Career Bundle
+            {t("Complete Career Bundle", "Complete Career Bundle")}
           </div>
           <div className="text-[32px] font-black">
             <span className="text-lg font-semibold text-[--text-secondary] align-top mr-0.5">
@@ -129,22 +130,24 @@ export function CheckoutView({ sessionId }: Props) {
             </span>
             999
             <span className="text-sm font-medium text-[--text-muted] ml-1">
-              one-time
+              {t("one-time", "isang beses")}
             </span>
           </div>
           <div className="text-sm text-[--text-muted] mt-2 leading-relaxed">
-            Everything in Full Unlock + resume optimization, cover letter, and
-            7-day practice mode.
+            {t(
+              "Everything in Full Unlock + resume optimization, cover letter, and 7-day practice mode.",
+              "Lahat ng nasa Full Unlock + resume optimization, cover letter, at 7-day practice mode."
+            )}
           </div>
         </div>
 
         {/* Comparison table */}
-        <div className="glass-card overflow-hidden mb-8">
+        <div className="glass-card overflow-hidden mb-8 animate-slide-up opacity-0 delay-3">
           <table className="w-full text-[13px]">
             <thead>
               <tr className="border-b border-[--border]">
                 <th className="text-left p-4 text-[--text-muted] font-medium">
-                  Feature
+                  {t("Feature", "Feature")}
                 </th>
                 <th className="p-4 text-center text-[--text-muted] font-medium">
                   ₱399
@@ -185,18 +188,20 @@ export function CheckoutView({ sessionId }: Props) {
           </table>
         </div>
 
-        {/* Payment info */}
-        <p className="text-[13px] text-[--text-muted] text-center mb-4">
-          Pay securely via GCash, Maya, or Cards (PayMongo)
+        <p className="text-[13px] text-[--text-muted] text-center mb-4 animate-fade-in delay-4">
+          {t(
+            "Pay securely via GCash, Maya, or Cards (PayMongo)",
+            "Magbayad nang ligtas gamit ang GCash, Maya, o Cards (PayMongo)"
+          )}
         </p>
 
         <Button
           size="lg"
           onClick={handleCheckout}
           loading={loading}
-          className="w-full"
+          className="w-full animate-slide-up opacity-0 delay-4"
         >
-          Proceed to PayMongo Checkout
+          {t("Proceed to PayMongo Checkout", "Magpatuloy sa PayMongo Checkout")}
         </Button>
       </div>
     </main>
